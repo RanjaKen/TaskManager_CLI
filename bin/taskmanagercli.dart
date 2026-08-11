@@ -96,10 +96,11 @@ Future<void> addTask(Taskservice service) async {
       title: title,
       priority: priority,
       deadline: dueDate,
+      isDone: false,
     );
   }
 
-  await service.createTask(task);
+  await service.addTask(task);
 
   print("Tâche ajoutée !");
 }
@@ -118,7 +119,7 @@ Future<void> listTasks(Taskservice service) async {
     print("""
             ID : ${task.id}
             Titre : ${task.title}
-            Priorité : ${task.priority}
+            Priorité : ${task.priority.name}
             Date : ${task.deadline ?? "aucune"}
             Statut : ${task.isDone ? "Terminée" : "En cours"}
             ---------------------
