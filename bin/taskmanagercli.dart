@@ -85,14 +85,14 @@ Future<void> addTask(Taskservice service) async {
 
   if (priority == Priority.high) {
     task = UrgentTask(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: DateTime.now().millisecondsSinceEpoch,
       title: title,
       deadline: dueDate,
       priority: priority,
     );
   } else {
     task = NormalTask(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: DateTime.now().millisecondsSinceEpoch,
       title: title,
       priority: priority,
       deadline: dueDate,
@@ -142,7 +142,7 @@ Future<void> deleteTask(Taskservice service) async {
 
   final id = int.parse(stdin.readLineSync()!);
 
-  await service.deleteTask(id as String);
+  await service.deleteTask(id);
 
   print("Tâche supprimée !");
 }

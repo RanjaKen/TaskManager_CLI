@@ -3,7 +3,7 @@ import 'package:taskmanagercli/models/priority.dart';
 import 'package:taskmanagercli/models/urgentTask.dart';
 
 abstract class Task {
-  final String id;
+  final int id;
   final String title;
   final DateTime? deadline;
   final Priority priority;

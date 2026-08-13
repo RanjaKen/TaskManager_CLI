@@ -14,7 +14,7 @@ class Taskrepository implements Repository<Task> {
     final tasks = await data.load();
 
     if (tasks.any((task) => task.id == item.id)) {
-      throw DuplicateTaskException(item.id as int);
+      throw DuplicateTaskException(item.id );
     }
 
     tasks.add(item);
@@ -29,7 +29,7 @@ class Taskrepository implements Repository<Task> {
     final index = tasks.indexWhere((task) => task.id == item.id);
 
     if (index == -1) {
-      throw TaskNotFoundException(item.id as int);
+      throw TaskNotFoundException(item.id );
     }
 
     tasks[index] = item;
@@ -39,7 +39,7 @@ class Taskrepository implements Repository<Task> {
   }
 
   @override
-  Future<void> delete(String id) async {
+  Future<void> delete(int id) async {
     // Implementation for deleting a task
     final tasks = await data.load();
 
