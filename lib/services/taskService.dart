@@ -23,7 +23,7 @@ class Taskservice implements taskService {
   }
 
   @override
-  Future<void> deleteTask(String id) async {
+  Future<void> deleteTask(int id) async {
     // Implementation for deleting a task
     await repository.delete(id);
   }

@@ -33,7 +33,7 @@ void main() {
 
     test("should add a task", () async {
       final task = NormalTask(
-        id: "1",
+        id: 1,
         title: "task one",
         priority: Priority.low,
         deadline: null,
@@ -50,7 +50,7 @@ void main() {
 
     test("should not allow duplicate id", () async {
       final task = NormalTask(
-        id: "1",
+        id: 1,
         title: "task one",
         priority: Priority.low,
         deadline: null,
@@ -67,7 +67,7 @@ void main() {
 
     test("should remove existing task", () async {
       final task = NormalTask(
-        id: "1",
+        id: 1,
         title: "Delete me",
         priority: Priority.low,
         deadline: null,
@@ -76,7 +76,7 @@ void main() {
 
       await repository.add(task);
 
-      await repository.delete("1");
+      await repository.delete(1);
 
       final tasks = await repository.getAll();
 
@@ -85,14 +85,14 @@ void main() {
 
     test("should throw when removing unknown task", () async {
       await expectLater(
-        repository.delete("99"),
+        repository.delete(99),
         throwsA(isA<TaskNotFoundException>()),
       );
     });
 
     test("should update task", () async {
       final task = NormalTask(
-        id: "1",
+        id: 1,
         title: "will update me",
         priority: Priority.low,
         deadline: null,
@@ -102,7 +102,7 @@ void main() {
       await repository.add(task);
 
       final updatedTask = UrgentTask(
-        id: "1",
+        id: 1,
         title: "New title",
         priority: Priority.high,
         deadline: null,
