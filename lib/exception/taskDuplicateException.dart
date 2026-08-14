@@ -1,4 +1,3 @@
-
 class DuplicateTaskException implements Exception {
   final int id;
 

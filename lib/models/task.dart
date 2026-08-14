@@ -17,10 +17,9 @@ abstract class Task {
     this.deadline,
     required this.priority,
     DateTime? createdAt,
-  }): createdAt = createdAt ?? DateTime.now();
+  }) : createdAt = createdAt ?? DateTime.now();
 
-
-void showDetails();
+  void showDetails();
 
   Map<String, dynamic> toJson() {
     return {
@@ -61,5 +60,3 @@ void showDetails();
     );
   }
 }
-
-

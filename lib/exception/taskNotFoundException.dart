@@ -6,4 +6,3 @@ class TaskNotFoundException implements Exception {
   @override
   String toString() => "Task with ID $id not found.";
 }
-
