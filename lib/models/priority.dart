@@ -7,7 +7,6 @@ enum Priority {
 
   const Priority(this.level);
 
-
   factory Priority.fromString(String value) {
     return switch (value.toLowerCase()) {
       "low" => Priority.low,
@@ -16,7 +15,6 @@ enum Priority {
       _ => throw ArgumentError("Unknown priority: $value"),
     };
   }
-
 
   String get displayName {
     return name.toUpperCase();

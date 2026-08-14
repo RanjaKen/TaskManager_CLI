@@ -1,9 +1,8 @@
-
-
 import 'dart:io';
 
-import 'package:taskmanagercli/data/data.dart';
 import 'package:taskmanagercli/data/taskData.dart';
+import 'package:taskmanagercli/exception/taskDuplicateException.dart';
+import 'package:taskmanagercli/exception/taskNotFoundException.dart';
 import 'package:taskmanagercli/models/normalTask.dart';
 import 'package:taskmanagercli/models/priority.dart';
 import 'package:taskmanagercli/models/task.dart';
@@ -12,137 +11,117 @@ import 'package:taskmanagercli/repo/taskRepository.dart';
 import 'package:taskmanagercli/services/taskService.dart';
 
 Future<void> main(List<String> arguments) async {
-  final data = Taskdata('tasks.json');
-
-  final repository = Taskrepository(data);
-
-  final service = Taskservice(repository);
+  final service = Taskservice(Taskrepository(Taskdata('tasks.json')));
 
   while (true) {
-    print("\n==========================");
-    print("       TASK MANAGER");
-    print("==========================");
-    print("1. Ajouter une tâche");
-    print("2. Afficher les tâches");
-    print("3. Terminer une tâche");
-    print("4. Supprimer une tâche");
-    print("5. Quitter");
-    print("==========================");
+    print('\n=== TASK MANAGER ===');
+    print('1. Add a task');
+    print('2. List tasks');
+    print('3. Mark a task as done');
+    print('4. Delete a task');
+    print('5. Exit');
+    stdout.write('Choose an option: ');
 
-    stdout.write("Votre choix : ");
-
-    final choice = stdin.readLineSync();
-
-    switch (choice) {
-      case "1":
+    switch (stdin.readLineSync()?.trim()) {
+      case '1':
         await addTask(service);
-        break;
-
-      case "2":
+      case '2':
         await listTasks(service);
-        break;
-
-      case "3":
+      case '3':
         await completeTask(service);
-        break;
-
-      case "4":
+      case '4':
         await deleteTask(service);
-        break;
-
-      case "5":
-        print("Au revoir !");
-        exit(0);
-
+      case '5':
+        print('Goodbye!');
+        return;
       default:
-        print("Choix invalide.");
+        print('Invalid option.');
     }
   }
 }
 
 Future<void> addTask(Taskservice service) async {
-  stdout.write("Titre : ");
-  final title = stdin.readLineSync()!;
+  stdout.write('Title: ');
+  final title = stdin.readLineSync()?.trim() ?? '';
+  if (title.isEmpty) return print('A title is required.');
 
-  stdout.write("Priorité (low/medium/high) : ");
-  final priorityInput = stdin.readLineSync();
-
-  final priority = Priority.values.firstWhere(
-    (p) => p.name == priorityInput,
-    orElse: () => Priority.low,
-  );
-
-  stdout.write("Date limite (YYYY-MM-DD ou vide) : ");
-  final dateInput = stdin.readLineSync();
-
-  DateTime? dueDate;
-
-  if (dateInput != null && dateInput.isNotEmpty) {
-    dueDate = DateTime.parse(dateInput);
+  stdout.write('Priority (low/medium/high): ');
+  final priorityText = stdin.readLineSync()?.trim().toLowerCase();
+  final priority = Priority.values
+      .where((p) => p.name == priorityText)
+      .firstOrNull;
+  if (priority == null) {
+    return print('Invalid priority. Use low, medium, or high.');
   }
 
-  Task task;
-
-  if (priority == Priority.high) {
-    task = UrgentTask(
-      id: DateTime.now().millisecondsSinceEpoch,
-      title: title,
-      deadline: dueDate,
-      priority: priority,
-    );
-  } else {
-    task = NormalTask(
-      id: DateTime.now().millisecondsSinceEpoch,
-      title: title,
-      priority: priority,
-      deadline: dueDate,
-      isDone: false,
-    );
+  stdout.write('Deadline (YYYY-MM-DD, optional): ');
+  final deadlineText = stdin.readLineSync()?.trim() ?? '';
+  final deadline = deadlineText.isEmpty
+      ? null
+      : DateTime.tryParse(deadlineText);
+  if (deadlineText.isNotEmpty && deadline == null) {
+    return print('Invalid date. Use YYYY-MM-DD.');
   }
 
-  await service.addTask(task);
-
-  print("Tâche ajoutée !");
+  final Task task = priority == Priority.high
+      ? UrgentTask(
+          id: DateTime.now().microsecondsSinceEpoch,
+          title: title,
+          priority: priority,
+          deadline: deadline,
+        )
+      : NormalTask(
+          id: DateTime.now().microsecondsSinceEpoch,
+          title: title,
+          priority: priority,
+          deadline: deadline,
+        );
+  try {
+    await service.addTask(task);
+    print('Task added.');
+  } on DuplicateTaskException catch (error) {
+    print(error);
+  } on ArgumentError catch (error) {
+    print(error.message);
+  }
 }
 
 Future<void> listTasks(Taskservice service) async {
   final tasks = await service.getAllTasks();
-
-  if (tasks.isEmpty) {
-    print("Aucune tâche.");
-    return;
-  }
-
-  print("\n----- Tâches -----");
-
+  if (tasks.isEmpty) return print('No tasks found.');
   for (final task in tasks) {
-    print("""
-            ID : ${task.id}
-            Titre : ${task.title}
-            Priorité : ${task.priority.name}
-            Date : ${task.deadline ?? "aucune"}
-            Statut : ${task.isDone ? "Terminée" : "En cours"}
-            ---------------------
-""");
+    final date = task.deadline?.toIso8601String().split('T').first ?? 'none';
+    print(
+      'ID: ${task.id} | ${task.title} | ${task.priority.name} | deadline: $date | ${task.isDone ? 'done' : 'open'}',
+    );
   }
 }
 
 Future<void> completeTask(Taskservice service) async {
-  stdout.write("ID de la tâche : ");
-
-  final id = int.parse(stdin.readLineSync()!);
-
-  await service.completeTask(id);
-
-  print("Tâche terminée !");
+  final id = _readTaskId();
+  if (id == null) return;
+  try {
+    await service.completeTask(id);
+    print('Task marked as done.');
+  } on TaskNotFoundException catch (error) {
+    print(error);
+  }
 }
 
 Future<void> deleteTask(Taskservice service) async {
-  stdout.write("ID de la tâche : ");
+  final id = _readTaskId();
+  if (id == null) return;
+  try {
+    await service.deleteTask(id);
+    print('Task deleted.');
+  } on TaskNotFoundException catch (error) {
+    print(error);
+  }
+}
 
-  final id = int.parse(stdin.readLineSync()!);
-
-  await service.deleteTask(id);
-
-  print("Tâche supprimée !");
+int? _readTaskId() {
+  stdout.write('Task ID: ');
+  final id = int.tryParse(stdin.readLineSync()?.trim() ?? '');
+  if (id == null) print('Task ID must be a number.');
+  return id;
 }

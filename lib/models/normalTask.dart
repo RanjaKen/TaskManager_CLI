@@ -3,13 +3,13 @@ import 'package:taskmanagercli/models/task.dart';
 
 class NormalTask extends Task {
   NormalTask({
-    required  super.id,
-    required  super.title,
-    required  super.priority,
+    required super.id,
+    required super.title,
+    required super.priority,
     super.isDone,
     super.deadline,
     super.createdAt,
-  }) : assert(priority != Priority.high) ;
+  }) : assert(priority != Priority.high);
 
   @override
   void showDetails() {

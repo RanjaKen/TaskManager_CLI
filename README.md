@@ -1,131 +1,52 @@
 # Task Manager CLI
 
-A simple command-line task manager built with **Dart 3**.
+A task management command-line app built with pure Dart 
 
 ## Features
 
-* Add a task
-* List all tasks
-* Mark a task as completed
-* Delete a task
-* Set task priority: `low`, `medium`, `high`
-* Add an optional deadline
-* Save tasks in a local JSON file
-* Unit tests
+* Add tasks with a title, `low`/`medium`/`high` priority, and an optional deadline
+* List tasks sorted by priority and then deadline
+* Mark tasks as done and delete tasks by ID
+* Persist tasks in the local `tasks.json` file
+* Report invalid input and missing or duplicate task IDs clearly
+
+## Technical design
+
+* `Task` is an abstract class, extended by `NormalTask` and `UrgentTask`.
+* `Repository<T>` and `Data<T>` are generic abstractions; `Taskrepository` implements `Repository<Task>`.
+* `taskService` is an interface implemented by `Taskservice`.
+* `TaskNotFoundException` and `DuplicateTaskException` are custom exceptions.
 
 ## Requirements
 
-* Dart 3 or higher
+* Dart SDK 3 or later
 
-Check Dart:
-
-```bash
-dart --version
-```
-
-## Installation
-
-Clone the project:
-
-```bash
-git clone https://github.com/YOUR_USERNAME/taskmanagercli.git
-```
-
-Go to the project:
-
-```bash
-cd taskmanagercli
-```
-
-Install dependencies:
+## Run
 
 ```bash
 dart pub get
+dart run bin/taskmanagercli.dart
 ```
 
-## Run the application
+## Test
 
 ```bash
-dart run bin/main.dart
+dart test
 ```
 
-## Example
+The suite includes more than five unit tests covering add, duplicate IDs, deletion, missing tasks, completion, and sorting.
 
-The application displays:
+## Data file
 
-```text
-==========================
-       TASK MANAGER
-==========================
-1. Ajouter une tâche
-2. Afficher les tâches
-3. Terminer une tâche
-4. Supprimer une tâche
-5. Quitter
-```
-
-### Add a task
-
-```text
-Titre : Learn Dart
-Priorité : high
-Date limite : 2026-08-20
-```
-
-### List tasks
-
-```text
-ID : 1
-Titre : Learn Dart
-Priorité : high
-Deadline : 2026-08-20
-Statut : En cours
-```
-
-## Data
-
-Tasks are saved in:
-
-```text
-data/tasks.json
-```
-
-Example:
+The app creates and updates `tasks.json` in the project root. A task is stored like this:
 
 ```json
-[
-  {
-    "id": "1",
-    "title": "Learn Dart",
-    "priority": "high",
-    "deadline": null,
-    "isDone": false
-  }
-]
+{
+  "id": 1,
+  "title": "Learn Dart",
+  "priority": "high",
+  "deadline": "2026-08-20T00:00:00.000",
+  "isDone": false,
+  "createdAt": "2026-08-14T10:00:00.000"
+}
 ```
-
-
-## Architecture
-
-```text
-CLI
- ↓
-TaskService
- ↓
-TaskRepository
- ↓
-TaskData
- ↓
-tasks.json
-```
-
-
-
-
-
-## Author
-
-**Andi Andriamalala**
-
-Dart CLI Task Manager Project
-

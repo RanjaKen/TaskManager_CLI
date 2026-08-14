@@ -20,101 +20,98 @@ class testDataclimanager implements Data<Task> {
   Future<List<Task>> load() async {
     return _tasks;
   }
-
-  
 }
 
 void main() {
-    late Taskrepository repository;
+  late Taskrepository repository;
 
-    setUp(() {
-      repository = Taskrepository(testDataclimanager());
-    });
+  setUp(() {
+    repository = Taskrepository(testDataclimanager());
+  });
 
-    test("should add a task", () async {
-      final task = NormalTask(
-        id: 1,
-        title: "task one",
-        priority: Priority.low,
-        deadline: null,
-        isDone: false,
-      );
+  test("should add a task", () async {
+    final task = NormalTask(
+      id: 1,
+      title: "task one",
+      priority: Priority.low,
+      deadline: null,
+      isDone: false,
+    );
 
-      await repository.add(task);
+    await repository.add(task);
 
-      final tasks = await repository.getAll();
+    final tasks = await repository.getAll();
 
-      expect(tasks.length, 1);
-      expect(tasks.first.title, "task one");
-    });
+    expect(tasks.length, 1);
+    expect(tasks.first.title, "task one");
+  });
 
-    test("should not allow duplicate id", () async {
-      final task = NormalTask(
-        id: 1,
-        title: "task one",
-        priority: Priority.low,
-        deadline: null,
-        isDone: false,
-      );
+  test("should not allow duplicate id", () async {
+    final task = NormalTask(
+      id: 1,
+      title: "task one",
+      priority: Priority.low,
+      deadline: null,
+      isDone: false,
+    );
 
-      await repository.add(task);
+    await repository.add(task);
 
-      await expectLater(
-        repository.add(task),
-        throwsA(isA<DuplicateTaskException>()),
-      );
-    });
+    await expectLater(
+      repository.add(task),
+      throwsA(isA<DuplicateTaskException>()),
+    );
+  });
 
-    test("should remove existing task", () async {
-      final task = NormalTask(
-        id: 1,
-        title: "Delete me",
-        priority: Priority.low,
-        deadline: null,
-        isDone: false,
-      );
+  test("should remove existing task", () async {
+    final task = NormalTask(
+      id: 1,
+      title: "Delete me",
+      priority: Priority.low,
+      deadline: null,
+      isDone: false,
+    );
 
-      await repository.add(task);
+    await repository.add(task);
 
-      await repository.delete(1);
+    await repository.delete(1);
 
-      final tasks = await repository.getAll();
+    final tasks = await repository.getAll();
 
-      expect(tasks.isEmpty, true);
-    });
+    expect(tasks.isEmpty, true);
+  });
 
-    test("should throw when removing unknown task", () async {
-      await expectLater(
-        repository.delete(99),
-        throwsA(isA<TaskNotFoundException>()),
-      );
-    });
+  test("should throw when removing unknown task", () async {
+    await expectLater(
+      repository.delete(99),
+      throwsA(isA<TaskNotFoundException>()),
+    );
+  });
 
-    test("should update task", () async {
-      final task = NormalTask(
-        id: 1,
-        title: "will update me",
-        priority: Priority.low,
-        deadline: null,
-        isDone: false,
-      );
+  test("should update task", () async {
+    final task = NormalTask(
+      id: 1,
+      title: "will update me",
+      priority: Priority.low,
+      deadline: null,
+      isDone: false,
+    );
 
-      await repository.add(task);
+    await repository.add(task);
 
-      final updatedTask = UrgentTask(
-        id: 1,
-        title: "New title",
-        priority: Priority.high,
-        deadline: null,
-        isDone: false,
-      );
+    final updatedTask = UrgentTask(
+      id: 1,
+      title: "New title",
+      priority: Priority.high,
+      deadline: null,
+      isDone: false,
+    );
 
-      await repository.update(updatedTask);
+    await repository.update(updatedTask);
 
-      final tasks = await repository.getAll();
+    final tasks = await repository.getAll();
 
-      expect(tasks.first.title, "New title");
-      expect(tasks.first.priority, Priority.high);
-    });
-    
-  }
+    expect(tasks.first.title, "New title");
+    expect(tasks.first.priority, Priority.high);
+  });
+}

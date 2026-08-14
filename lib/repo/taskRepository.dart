@@ -14,7 +14,7 @@ class Taskrepository implements Repository<Task> {
     final tasks = await data.load();
 
     if (tasks.any((task) => task.id == item.id)) {
-      throw DuplicateTaskException(item.id );
+      throw DuplicateTaskException(item.id);
     }
 
     tasks.add(item);
@@ -29,13 +29,12 @@ class Taskrepository implements Repository<Task> {
     final index = tasks.indexWhere((task) => task.id == item.id);
 
     if (index == -1) {
-      throw TaskNotFoundException(item.id );
+      throw TaskNotFoundException(item.id);
     }
 
     tasks[index] = item;
 
     await data.save(tasks);
-  
   }
 
   @override
@@ -44,7 +43,7 @@ class Taskrepository implements Repository<Task> {
     final tasks = await data.load();
 
     if (!tasks.any((task) => task.id == id)) {
-      throw TaskNotFoundException(id as int);
+      throw TaskNotFoundException(id);
     }
 
     tasks.removeWhere((task) => task.id == id);
@@ -57,6 +56,4 @@ class Taskrepository implements Repository<Task> {
     // Implementation for getting all tasks
     return await data.load();
   }
-
-  
 }
